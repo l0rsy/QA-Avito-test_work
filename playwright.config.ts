@@ -6,6 +6,7 @@ const BASE_URL = "https://cerulean-praline-8e5aa6.netlify.app/";
 
 export default defineConfig({
     testDir: "./tests",
+    testMatch: "**/*.ts",
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
