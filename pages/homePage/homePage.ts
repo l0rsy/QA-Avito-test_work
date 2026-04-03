@@ -8,6 +8,9 @@ export class HomePage extends BasePage {
     private readonly priceToInput: Locator;     // Поле "Цена до"
     private readonly itemPrices: Locator;       // Цены объявлений
     private readonly realoadListInfo: Locator;  // Обновление списка объявлений
+    private readonly emptyStateTitle: Locator;  // Надпись "Объявления не найдены"
+    private readonly emptyStateHint: Locator;  // Надпись "Попробуйте изменить параметры фильтрации"
+    private readonly resetFiltersButton: Locator;  // Кнопка "Сбросить фильтры"
 
     constructor(page: Page) {
         super(page);
@@ -16,7 +19,10 @@ export class HomePage extends BasePage {
         this.priceFromInput = page.locator('input[placeholder="От"]');
         this.priceToInput = page.locator('input[placeholder="До"]');
         this.itemPrices = page.locator('div[class="_card__price_15fhn_241"]')
-        this.realoadListInfo = page.locator('xpath=//div[text()="Обновление данных"]');
+        this.realoadListInfo = page.getByText("Обновление данных");
+        this.emptyStateTitle = page.getByText("📭 Объявления не найдены")
+        this.emptyStateHint = page.getByText('Попробуйте изменить параметры фильтрации');
+        this.resetFiltersButton = page.getByRole('button', { name: 'Сбросить фильтры' });
     }
 
     // Открыть главную страницу
@@ -65,8 +71,52 @@ export class HomePage extends BasePage {
         }
     }
 
+    // Проверка состояния "Объявления не найдены"
+    async assertEmptyStateIsVisible() {
+        await expect(this.emptyStateTitle, 'Заголовок "Объявления не найдены" не отображается')
+            .toBeVisible();
+        await expect(this.emptyStateHint, 'Подсказка "Попробуйте изменить параметры фильтрации" не отображается')
+            .toBeVisible();
+        await expect(this.resetFiltersButton, 'Кнопка "Сбросить фильтры" не отображается')
+            .toBeVisible();
+    }
 
-
-
+    // Проверка что поля "От" и "До" подсвечиваются красным при ошибке
+    async assertPriceInputsAreHighlightedAsInvalid() {
+        // Проверяем поле "От"
+        const fromInputHasError = await this.priceFromInput.evaluate((element) => {
+            const el = element as HTMLInputElement;
+            // Проверяем различные признаки ошибки
+            return el.classList.contains('error') ||
+                   el.classList.contains('_error') ||
+                   el.classList.contains('invalid') ||
+                   el.getAttribute('aria-invalid') === 'true' ||
+                   getComputedStyle(el).borderColor === 'rgb(255, 0, 0)' ||
+                   getComputedStyle(el).borderColor === 'red' ||
+                   el.style.borderColor === 'red';
+        });
+        
+        // Проверяем поле "До"
+        const toInputHasError = await this.priceToInput.evaluate((element) => {
+            const el = element as HTMLInputElement;
+            return el.classList.contains('error') ||
+                   el.classList.contains('_error') ||
+                   el.classList.contains('invalid') ||
+                   el.getAttribute('aria-invalid') === 'true' ||
+                   getComputedStyle(el).borderColor === 'rgb(255, 0, 0)' ||
+                   getComputedStyle(el).borderColor === 'red' ||
+                   el.style.borderColor === 'red';
+        });
+        
+        expect(fromInputHasError, 
+            `Поле "От" должно быть подсвечено красным при min > max 
+            ИЛИ должно быть другое подобное поведение, прописанное в ТЗ. Нужно уточнить`)
+            .toBe(true);
+    
+        expect(toInputHasError, 
+            `Поле "До" должно быть подсвечено красным при min > max 
+            ИЛИ должно быть другое подобное поведение, прописанное в ТЗ. Нужно уточнить`)
+            .toBe(true);
+    }
 }
 
