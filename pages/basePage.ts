@@ -28,6 +28,13 @@ export class BasePage {
         const inputLocator = selector;
 
         await inputLocator.clear();
-        if (value) {await inputLocator.fill(value)}
+        if (value) {
+            // pressSequentially для случая, если вводим строку
+            try {
+                await inputLocator.fill(value);
+            } catch (error) {
+                await inputLocator.pressSequentially(value);
+            }
+        }
     }
 }
