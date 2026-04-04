@@ -9,6 +9,7 @@ export class HomePage extends BasePage {
     private readonly priceToInput: Locator; // Поле "Цена до"
 
     private readonly itemPrices: Locator; // Цены объявлений
+    private readonly resetFiltersSideButton: Locator; // Кнопка "Сбросить"
 
     private readonly realoadListInfo: Locator; // Обновление списка объявлений
 
@@ -31,6 +32,8 @@ export class HomePage extends BasePage {
         DESC: 'desc' 
     } as const;    
 
+    private readonly categorySelect: Locator; // Селектор с категориями
+
 
     constructor(page: Page) {
         super(page);
@@ -39,12 +42,15 @@ export class HomePage extends BasePage {
         this.priceFromInput = page.locator('input[placeholder="От"]');
         this.priceToInput = page.locator('input[placeholder="До"]');
         this.itemPrices = page.locator('div[class="_card__price_15fhn_241"]');
+        this.resetFiltersSideButton = page.getByRole('button', { name: 'Сбросить' });
         this.realoadListInfo = page.getByText("Обновление данных");
         this.emptyStateTitle = page.getByText("📭 Объявления не найдены");
         this.emptyStateHint = page.getByText('Попробуйте изменить параметры фильтрации');
         this.resetFiltersButton = page.getByRole('button', { name: 'Сбросить фильтры' });
+
         this.sortBy = page.locator('xpath=//*[@id="root"]/div/div[1]/div[2]/div/div[1]/select');
         this.sortOrder = page.locator('xpath=//*[@id="root"]/div/div[1]/div[2]/div/div[2]/select');
+        this.categorySelect = page.locator('xpath=//*[@id="root"]/div/div[2]/aside/div[2]/div[2]/select');
  
     }
 
@@ -62,6 +68,11 @@ export class HomePage extends BasePage {
         if (to) {
             await this.fillInput(this.priceToInput, to);
         }
+        await this.waitForListUpdate(this.realoadListInfo);
+    }
+    // Метод для нажатия кнопки "Сбросить"
+    async clickSideResetFilters() {
+        await this.resetFiltersSideButton.click();
         await this.waitForListUpdate(this.realoadListInfo);
     }
 
@@ -107,6 +118,54 @@ export class HomePage extends BasePage {
         await this.sortOrder.selectOption({ value: sortValue });
         
         await this.waitForListUpdate(this.realoadListInfo);
+    }
+
+    // Метод для получения доступных категорий
+    async getAllCategories(): Promise<{ value: string; name: string }[]> {
+        const categories: {value: string; name: string}[] = [];
+
+        const options = await this.categorySelect.locator('option').all();
+        for (const option of options) {
+            const value = await option.getAttribute('value');
+            const name = await option.textContent();
+
+            if (value !== '' && value !== null && name) {
+                categories.push({value, name});
+            }
+        }
+        return categories;
+    }
+
+    // Метод для выбора категории по значению
+    async selectCategory(categoryValue: string) {
+        await this.categorySelect.selectOption({value: categoryValue});
+        await this.waitForListUpdate(this.realoadListInfo);
+    }
+
+    // Метод для получения категории объявления по индексу
+    async getItemCategory(itemIndex: number): Promise<string> {
+        const categoryLocator = this.itemPrices.nth(itemIndex)
+            .locator('..') // Поднимаемся к родителю
+            .locator('div[class*="_card__category_15fhn_259"]');
+        
+        const categoryText = await categoryLocator.textContent();
+        if (!categoryText) {
+            throw new Error(`Не удалось получить категорию для объявления ${itemIndex + 1}`);
+        }
+        return categoryText.trim();
+    }
+
+    // Методя для получения ВСЕХ категорий на странице
+    async getAllItemsCategories(): Promise<string[]> {
+        const categories: string[] = [];
+        const itemsCount = await this.itemPrices.count();
+        
+        for (let i = 0; i < itemsCount; i++) {
+            const category = await this.getItemCategory(i);
+            categories.push(category);
+        }
+        
+        return categories;
     }
 
     // ===================== ASSERTS =====================
@@ -216,6 +275,44 @@ export class HomePage extends BasePage {
                 `Цена ${prices[i]} (позиция ${i + 1}) не больше или равна следующей цене ${prices[i + 1]} (позиция ${i + 2})`)
                 .toBeGreaterThanOrEqual(prices[i + 1]);
         }
+    }
+
+    // Проверка, что все объявления соответствуют выбранной категории
+    async assertAllItemsMatchCategory(expectedCategory: string) {
+        const itemsCount = await this.itemPrices.count();
+
+        if (itemsCount === 0) {
+            throw new Error("Нет объявлений для проверки категории");
+        }
+        for (let i = 0; i < itemsCount; i++) {
+            // Получаем категорию объявления (нужно уточнить локатор)
+            const itemCategory = await this.getItemCategory(i);
+            
+            expect(itemCategory, 
+                `Объявление ${i + 1} имеет категорию "${itemCategory}", ожидалась "${expectedCategory}"`)
+                .toBe(expectedCategory);
+        }
+    }
+
+    // Проверка, что все объявления принадлежат одной категории
+    async assertAllItemsHaveSameCategory(expectedCategory: string) {
+        const categories = await this.getAllItemsCategories();
+        
+        for (let i = 0; i < categories.length; i++) {
+            expect(categories[i], 
+                `Объявление ${i + 1} имеет категорию "${categories[i]}", ожидалась "${expectedCategory}"`)
+                .toBe(expectedCategory);
+        }
+    }
+
+    // Проверка, что в ленте есть объявления из разных категорий
+    async assertItemsHaveMultipleCategories() {
+        const categories = await this.getAllItemsCategories();
+        const uniqueCategories = [...new Set(categories)];
+        
+        expect(uniqueCategories.length, 
+            `После сброса фильтра должно быть несколько категорий, найдено: ${uniqueCategories.join(', ')}`)
+            .toBeGreaterThan(1);
     }
 
 }
