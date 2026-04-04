@@ -34,6 +34,10 @@ export class HomePage extends BasePage {
 
     private readonly categorySelect: Locator; // Селектор с категориями
 
+    private readonly urgentToggle: Locator; // Тогл "Только срочные"
+    private readonly urgentIndicator: Locator; // Индикатор "Срочно" на объявлении
+
+
 
     constructor(page: Page) {
         super(page);
@@ -47,10 +51,11 @@ export class HomePage extends BasePage {
         this.emptyStateTitle = page.getByText("📭 Объявления не найдены");
         this.emptyStateHint = page.getByText('Попробуйте изменить параметры фильтрации');
         this.resetFiltersButton = page.getByRole('button', { name: 'Сбросить фильтры' });
-
         this.sortBy = page.locator('xpath=//*[@id="root"]/div/div[1]/div[2]/div/div[1]/select');
         this.sortOrder = page.locator('xpath=//*[@id="root"]/div/div[1]/div[2]/div/div[2]/select');
         this.categorySelect = page.locator('xpath=//*[@id="root"]/div/div[2]/aside/div[2]/div[2]/select');
+        this.urgentToggle = page.locator('span[class*="_urgentToggle__slider_h1vv9_21"]');
+        this.urgentIndicator = page.locator('span[class*="_card__priority_15fhn_172"]:has-text("Срочно")');
  
     }
 
@@ -83,6 +88,11 @@ export class HomePage extends BasePage {
             throw new Error("Не удалось получить цену объявления");
         }
         return parseInt(priceText.replace(/[^0-9]/g, ""));
+    }
+
+    // Метод для получения количества объявлений на странице
+    async getItemsCount(): Promise<number> {
+        return await this.itemPrices.count();
     }
 
     // Метод для получения всех цен на странице
@@ -167,6 +177,27 @@ export class HomePage extends BasePage {
         
         return categories;
     }
+
+    // Метод для нажатия на тогл "Только срочные"
+    async toggleUrgentOnly(enable: boolean) {
+        const isChecked = await this.urgentToggle.evaluate(el => {
+            const input = el.closest('label')?.querySelector('input[type="checkbox"]');
+            return input ? (input as HTMLInputElement).checked : false;
+        });
+        
+        if (isChecked !== enable) {
+            await this.urgentToggle.click();
+            await this.waitForListUpdate(this.realoadListInfo);
+        }
+    }
+
+    // Метод для получения количества объявлений без индикатора "Срочно"
+    async getItemsWithoutUrgentIndicatorCount(): Promise<number> {
+        const totalCount = await this.itemPrices.count();
+        const urgentCount = await this.urgentIndicator.count();
+        return totalCount - urgentCount;
+    }
+
 
     // ===================== ASSERTS =====================
     
@@ -315,5 +346,56 @@ export class HomePage extends BasePage {
             .toBeGreaterThan(1);
     }
 
+    // Проверка, что в ленте есть и срочные, и обычные объявления
+    async assertBothUrgentAndRegularItems(): Promise<boolean> {
+        const urgentCount = await this.urgentIndicator.count();
+        const totalCount = await this.itemPrices.count();
+        
+        return urgentCount > 0 && urgentCount < totalCount;
+    }
+
+    // Проверка, что все объявления имеют индикатор "Срочно"
+    async assertAllItemsHaveUrgentIndicator() {
+        const itemsCount = await this.itemPrices.count();
+        
+        const urgentIndicators = await this.urgentIndicator.count();
+        
+        expect(urgentIndicators, 
+            `Количество объявлений (${itemsCount}) не совпадает с количеством индикаторов "Срочно" (${urgentIndicators})`)
+            .toBe(itemsCount);
+        
+        // Дополнительная проверка - каждый индикатор видим
+        for (let i = 0; i < urgentIndicators; i++) {
+            await expect(this.urgentIndicator.nth(i), 
+                `Индикатор "Срочно" у объявления ${i + 1} не видим`)
+                .toBeVisible();
+        }
+    }
+
+    // Проверка, что есть объявления без индикатора "Срочно"
+    async assertThereAreItemsWithoutUrgentIndicator() {
+        const nonUrgentCount = await this.getItemsWithoutUrgentIndicatorCount();
+        
+        expect(nonUrgentCount, 
+            `После выключения тогла должны появиться объявления без индикатора "Срочно"`)
+            .toBeGreaterThan(0);
+    }
+    
+    // Проверка, что все цены находятся в заданном диапазоне
+    async assertAllPricesAreInRange(minPrice: string, maxPrice: string) {
+        const min = parseInt(minPrice);
+        const max = parseInt(maxPrice);
+        const prices = await this.getAllPrices();
+        
+        for (let i = 0; i < prices.length; i++) {
+            expect(prices[i], 
+                `Цена объявления ${i + 1} (${prices[i]}) ниже минимальной границы ${min}`)
+                .toBeGreaterThanOrEqual(min);
+            
+            expect(prices[i], 
+                `Цена объявления ${i + 1} (${prices[i]}) выше максимальной границы ${max}`)
+                .toBeLessThanOrEqual(max);
+        }
+    }
 }
 
