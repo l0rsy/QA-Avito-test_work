@@ -25,15 +25,16 @@ npx playwright install
 npx playwright test
 ```
 
-Запустить конкретный тестовый файл TEST_NAME.ts:
+Запустить конкретный тестовый файл TEST_NAME.ts в ДЕСКТОПНОЙ версии:
 ```bash
-npx playwright test tests/PATH_TO_TEST/TEST_NAME.ts
+npx playwright test tests/PATH_TO_TEST/TEST_NAME.ts --project=chromium
 ```
 
-Запустить конкретный тест по названию:
+Запустить конкретный тестовый файл TEST_NAME.ts в МОБИЛЬНОЙ версии:
 ```bash
-npx playwright test -g "Название"
+npx playwright test tests/PATH_TO_TEST/TEST_NAME.ts --project=mobile-phone
 ```
+
 ## Линтер (ESLint)
 
 #### Проверить проект линтером:

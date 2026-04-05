@@ -37,7 +37,8 @@ export class HomePage extends BasePage {
     private readonly urgentToggle: Locator; // Тогл "Только срочные"
     private readonly urgentIndicator: Locator; // Индикатор "Срочно" на объявлении
 
-
+    private readonly themeToggle: Locator; // Тогл переключения темы
+    private readonly body: Locator; // Body страницы (для проверки смены темы)
 
     constructor(page: Page) {
         super(page);
@@ -56,13 +57,21 @@ export class HomePage extends BasePage {
         this.categorySelect = page.locator('xpath=//*[@id="root"]/div/div[2]/aside/div[2]/div[2]/select');
         this.urgentToggle = page.locator('span[class*="_urgentToggle__slider_h1vv9_21"]');
         this.urgentIndicator = page.locator('span[class*="_card__priority_15fhn_172"]:has-text("Срочно")');
- 
+        this.themeToggle = page.locator('button._themeToggle_127us_1');
+        this.body = page.locator('body');
     }
 
     // Открыть главную страницу
     async open() {
         await this.navigate('/');
         await this.waitForListUpdate(this.realoadListInfo);
+    }
+
+    // Метод переключения темы страницы
+    async toggleTheme() {
+        await this.themeToggle.click();
+        await this.waitForListUpdate(this.realoadListInfo);
+
     }
 
     // Метод для установления значений в поля "От" и "До"
@@ -75,6 +84,7 @@ export class HomePage extends BasePage {
         }
         await this.waitForListUpdate(this.realoadListInfo);
     }
+
     // Метод для нажатия кнопки "Сбросить"
     async clickSideResetFilters() {
         await this.resetFiltersSideButton.click();
@@ -197,6 +207,42 @@ export class HomePage extends BasePage {
         const urgentCount = await this.urgentIndicator.count();
         return totalCount - urgentCount;
     }
+
+    // Метод для получения текущей темы
+    async getCurrentTheme() {
+        const buttonHtml = await this.themeToggle.innerHTML();
+    
+        if (buttonHtml.includes('☀️') || buttonHtml.includes('Светлая')) {
+            return 'light';
+        }
+        if (buttonHtml.includes('🌙') || buttonHtml.includes('Темная')) {
+            return 'dark';
+        }
+        
+        throw new Error('Не удалось определить текущую тему');
+    }
+
+    // Метод для получения цвета фона body
+    async getBodyBackgroundColor(): Promise<string> {
+        return await this.body.evaluate((el) => {
+            return window.getComputedStyle(el).backgroundColor;
+        });
+    }
+
+    // Метод для получения цвета текста body
+    async getBodyTextColor(): Promise<string> {
+        return await this.body.evaluate((el) => {
+            return window.getComputedStyle(el).color;
+        });
+    }
+
+    // Метод для сохранения темы в storage
+    async saveThemeToStorage() {
+        const theme = await this.getCurrentTheme();
+        await this.page.evaluate((currentTheme) => {
+            localStorage.setItem('savedTheme', currentTheme);
+        }, theme);
+}
 
 
     // ===================== ASSERTS =====================
@@ -396,6 +442,39 @@ export class HomePage extends BasePage {
                 `Цена объявления ${i + 1} (${prices[i]}) выше максимальной границы ${max}`)
                 .toBeLessThanOrEqual(max);
         }
+    }
+
+    // Проверка, что тема светлая
+    async assertThemeIsLight() {
+        const theme = await this.getCurrentTheme();
+        expect(theme, 'Тема должна быть светлой').toBe('light');
+        
+        const dataTheme = await this.body.getAttribute('data-theme');
+        if (dataTheme) {
+            expect(dataTheme, 'data-theme должен быть light').toBe('light');
+        }
+    }
+
+    // Проверка, что тема темная
+    async assertThemeIsDark() {
+        const theme = await this.getCurrentTheme();
+        expect(theme, 'Тема должна быть темной').toBe('dark');
+        
+        const dataTheme = await this.body.getAttribute('data-theme');
+        if (dataTheme) {
+            expect(dataTheme, 'data-theme должен быть dark').toBe('dark');
+        }
+    }
+
+    // Проверка, что сохраненная тема совпадает с текущей
+    async assertThemeMatchesSaved() {
+        const savedTheme = await this.page.evaluate(() => {
+            return localStorage.getItem('savedTheme');
+        });
+        const currentTheme = await this.getCurrentTheme();
+        
+        expect(currentTheme, `Тема должна быть ${savedTheme}, но текущая ${currentTheme}`)
+            .toBe(savedTheme as 'light' | 'dark');
     }
 }
 

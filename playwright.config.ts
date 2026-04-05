@@ -30,5 +30,14 @@ export default defineConfig({
             name: "chromium",
             use: { ...devices["Desktop Chrome"], baseURL: BASE_URL },
         },
+
+        {
+            name: "mobile-phone",
+            use: { 
+                ...devices["Pixel 7"], 
+                baseURL: BASE_URL,
+                headless: false,
+            },
+        },
     ],
 });
