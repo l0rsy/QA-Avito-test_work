@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { StatisticPage } from '../../pages/statisticsPage/statisticsPage';
 
 test.describe("Кнопка 'Обновить'", () => {

@@ -145,7 +145,7 @@ at D:\Code\QA-Avito-test_work\tests\desktop\TC-DESK-10.ts:28:9
 
 **Фактический результат:**
 Ошибка\
-![](./tests_images/stats_page_bug.jpg)
+![](./images/bugs_images/stats_page_bug.jpg)
 
 **Ожидаемый результат:**
 Страница должн загружаться корректно. Так же, как и при нажатии кнопки **"Статистика"** на главной странице

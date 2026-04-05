@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test  } from '@playwright/test';
 import { StatisticPage } from '../../pages/statisticsPage/statisticsPage';
 
 test.describe("Управление таймером статистики", () => {
@@ -10,12 +10,12 @@ test.describe("Управление таймером статистики", () =
         
         // Act
         await statsPage.open();
-        await statsPage.clicktimerToggleButton();
+        await statsPage.clickTimerToggleButton();
 
         await statsPage.assertTimerIsStopped();
         await statsPage.assertTimerToggleIsPlayIcon();
         
-        await statsPage.clicktimerToggleButton();
+        await statsPage.clickTimerToggleButton();
 
         // Assert
         await statsPage.assertTimerIsActive();

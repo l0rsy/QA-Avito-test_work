@@ -33,7 +33,7 @@ export class StatisticPage extends BasePage {
     }
 
     // Метод для нажатия кнопки "Пауза"
-    async clicktimerToggleButton() {
+    async clickTimerToggleButton() {
         await this.timerToggleButton.click();
         await this.page.waitForTimeout(500);
     }
@@ -49,7 +49,7 @@ export class StatisticPage extends BasePage {
 
     // Метод для нажатия кнопки "Обновить" с мгновенной проверкой сброса таймера
     async clickRefreshButtonAndVerifyReset() {
-        await this.page.waitForTimeout(3000);
+        await this.page.waitForTimeout(2000);
         await this.refreshButton.click();
         
         // Мгновенная проверка, что время стало 5:00

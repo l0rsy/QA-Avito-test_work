@@ -2,7 +2,7 @@
 
 ## Задание 1: Скриншот с багами
 
-![](./tests_images/task_1.png)
+![](./images/tests_images/task_1.png)
 
 ### Предусловие
 
