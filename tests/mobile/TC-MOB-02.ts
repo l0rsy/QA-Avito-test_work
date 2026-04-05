@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Мобильная версия - переключение темы", () => {
     test("TC-MOB-02: Переключение на темную тему", async ({ page }) => {
@@ -13,7 +13,7 @@ test.describe("Мобильная версия - переключение тем
         
         // Если текущая тема светлая - переключаем на темную
         const currentTheme = await homePage.getCurrentTheme();
-        if (currentTheme === 'light') {
+        if (currentTheme === "light") {
             await homePage.toggleTheme();
         }
         

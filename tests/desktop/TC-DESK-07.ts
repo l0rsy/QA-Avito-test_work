@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test, expect } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Категории", () => {
     test("TC-DESK-07: Проверка сброса категорий", async ({ page }) => {
@@ -24,11 +24,11 @@ test.describe("Категории", () => {
 
         // Act - 2
         await homePage.clickSideResetFilters();
-        await homePage.waitForListUpdate(homePage['realoadListInfo']);
+        await homePage.waitForListUpdate(homePage["realoadListInfo"]);
         
         // Assert - 2
-        const selectedValue = await homePage['categorySelect'].inputValue();
-        expect(selectedValue, 'Фильтр категории должен быть сброшен на "Все категории"').toBe('');
+        const selectedValue = await homePage["categorySelect"].inputValue();
+        expect(selectedValue, "Фильтр категории должен быть сброшен на \"Все категории\"").toBe("");
         
         await homePage.assertItemsHaveMultipleCategories();
 

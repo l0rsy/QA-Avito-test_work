@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { StatisticPage } from '../../pages/statisticsPage/statisticsPage';
+import { test } from "@playwright/test";
+import { StatisticPage } from "../../pages/statisticsPage/statisticsPage";
 
 test.describe("Кнопка 'Обновить'", () => {
     test("TC-STATS-01: Нажатие кнопки 'Обновить'", async ({ page }) => {

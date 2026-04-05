@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Сортировка по цене", () => {
     test("TC-DESK-04: Проверка сортировки по цене - возрастание", async ({ page }) => {
@@ -13,8 +13,8 @@ test.describe("Сортировка по цене", () => {
         
         // Act
         await homePage.open();
-        await homePage.selectSortBy('PRICE');
-        await homePage.selectSortOrder('ASC');
+        await homePage.selectSortBy("PRICE");
+        await homePage.selectSortOrder("ASC");
         
         // Assert
         await homePage.assertPricesAreNonDecreasing();

@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test, expect } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Тогл 'Только срочные'", () => {
     test("TC-DESK-09: Проверка выключения тогла 'Только срочные' ", async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe("Тогл 'Только срочные'", () => {
         await homePage.open();
         
         const hasBoth = await homePage.assertBothUrgentAndRegularItems();
-        test.skip(!hasBoth, 'В ленте нет одновременно срочных и обычных объявлений для проверки');
+        test.skip(!hasBoth, "В ленте нет одновременно срочных и обычных объявлений для проверки");
 
         await homePage.toggleUrgentOnly(true);
         const itemsCountWithUrgentOnly = await homePage.getItemsCount();
@@ -24,7 +24,7 @@ test.describe("Тогл 'Только срочные'", () => {
         // Assert
         const itemsCountAfterToggle = await homePage.getItemsCount();
         expect(itemsCountAfterToggle, 
-            'После выключения тогла количество объявлений должно увеличиться')
+            "После выключения тогла количество объявлений должно увеличиться")
             .toBeGreaterThan(itemsCountWithUrgentOnly);
         
         await homePage.assertThereAreItemsWithoutUrgentIndicator();

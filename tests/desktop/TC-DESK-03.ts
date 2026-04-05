@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Фильтр диапазона цен", () => {
     test("TC-DESK-03: Проверка ввода букв", async ({ page }) => {
@@ -13,7 +13,7 @@ test.describe("Фильтр диапазона цен", () => {
         
         // Act
         await homePage.open();
-        await homePage.setPriceRange('abc', '');
+        await homePage.setPriceRange("abc", "");
         
         // Assert
         await homePage.assertPriceFromInputIsEmpty();

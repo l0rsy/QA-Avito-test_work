@@ -1,5 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
-import { BasePage } from '../basePage';
+import { Page, Locator, expect } from "@playwright/test";
+import { BasePage } from "../basePage";
 
 export class HomePage extends BasePage {
     // Локаторы
@@ -20,16 +20,16 @@ export class HomePage extends BasePage {
     private readonly sortBy: Locator; // "Сортировать по"
     // Значения для сортировки
     private readonly sortOptions = {
-        DATE: 'createdAt',
-        PRICE: 'price',
-        PRIORITY: 'priority'
+        DATE: "createdAt",
+        PRICE: "price",
+        PRIORITY: "priority"
     } as const;
 
     private readonly sortOrder: Locator; // "Порядок"
     // Статусы порядка сортировки
     private readonly sortOrders = {
-        ASC: 'asc',
-        DESC: 'desc' 
+        ASC: "asc",
+        DESC: "desc" 
     } as const;    
 
     private readonly categorySelect: Locator; // Селектор с категориями
@@ -43,27 +43,27 @@ export class HomePage extends BasePage {
     constructor(page: Page) {
         super(page);
         // Определяем локаторы
-        this.searchInput = page.locator('input[placeholder="Введите название..."]');
-        this.priceFromInput = page.locator('input[placeholder="От"]');
-        this.priceToInput = page.locator('input[placeholder="До"]');
-        this.itemPrices = page.locator('div[class="_card__price_15fhn_241"]');
-        this.resetFiltersSideButton = page.getByRole('button', { name: 'Сбросить' });
+        this.searchInput = page.locator("input[placeholder=\"Введите название...\"]");
+        this.priceFromInput = page.locator("input[placeholder=\"От\"]");
+        this.priceToInput = page.locator("input[placeholder=\"До\"]");
+        this.itemPrices = page.locator("div[class=\"_card__price_15fhn_241\"]");
+        this.resetFiltersSideButton = page.getByRole("button", { name: "Сбросить" });
         this.realoadListInfo = page.getByText("Обновление данных");
         this.emptyStateTitle = page.getByText("📭 Объявления не найдены");
-        this.emptyStateHint = page.getByText('Попробуйте изменить параметры фильтрации');
-        this.resetFiltersButton = page.getByRole('button', { name: 'Сбросить фильтры' });
-        this.sortBy = page.locator('xpath=//*[@id="root"]/div/div[1]/div[2]/div/div[1]/select');
-        this.sortOrder = page.locator('xpath=//*[@id="root"]/div/div[1]/div[2]/div/div[2]/select');
-        this.categorySelect = page.locator('xpath=//*[@id="root"]/div/div[2]/aside/div[2]/div[2]/select');
-        this.urgentToggle = page.locator('span[class*="_urgentToggle__slider_h1vv9_21"]');
-        this.urgentIndicator = page.locator('span[class*="_card__priority_15fhn_172"]:has-text("Срочно")');
-        this.themeToggle = page.locator('button._themeToggle_127us_1');
-        this.body = page.locator('body');
+        this.emptyStateHint = page.getByText("Попробуйте изменить параметры фильтрации");
+        this.resetFiltersButton = page.getByRole("button", { name: "Сбросить фильтры" });
+        this.sortBy = page.locator("xpath=//*[@id=\"root\"]/div/div[1]/div[2]/div/div[1]/select");
+        this.sortOrder = page.locator("xpath=//*[@id=\"root\"]/div/div[1]/div[2]/div/div[2]/select");
+        this.categorySelect = page.locator("xpath=//*[@id=\"root\"]/div/div[2]/aside/div[2]/div[2]/select");
+        this.urgentToggle = page.locator("span[class*=\"_urgentToggle__slider_h1vv9_21\"]");
+        this.urgentIndicator = page.locator("span[class*=\"_card__priority_15fhn_172\"]:has-text(\"Срочно\")");
+        this.themeToggle = page.locator("button._themeToggle_127us_1");
+        this.body = page.locator("body");
     }
 
     // Открыть главную страницу
     async open() {
-        await this.navigate('/');
+        await this.navigate("/");
         await this.waitForListUpdate(this.realoadListInfo);
     }
 
@@ -123,7 +123,7 @@ export class HomePage extends BasePage {
     }
 
     // Метод для выбор ТИПА сортировки
-    async selectSortBy(sortType: 'DATE' | 'PRICE' | 'PRIORITY') {
+    async selectSortBy(sortType: "DATE" | "PRICE" | "PRIORITY") {
         const sortValue = this.sortOptions[sortType];
         
         await this.sortBy.selectOption({ value: sortValue });
@@ -132,7 +132,7 @@ export class HomePage extends BasePage {
     }
 
     // Метод для выбора ПОРЯДКА сортировки
-    async selectSortOrder(orderType: 'ASC' | 'DESC') {
+    async selectSortOrder(orderType: "ASC" | "DESC") {
         const sortValue = this.sortOrders[orderType];
         
         await this.sortOrder.selectOption({ value: sortValue });
@@ -144,12 +144,12 @@ export class HomePage extends BasePage {
     async getAllCategories(): Promise<{ value: string; name: string }[]> {
         const categories: {value: string; name: string}[] = [];
 
-        const options = await this.categorySelect.locator('option').all();
+        const options = await this.categorySelect.locator("option").all();
         for (const option of options) {
-            const value = await option.getAttribute('value');
+            const value = await option.getAttribute("value");
             const name = await option.textContent();
 
-            if (value !== '' && value !== null && name) {
+            if (value !== "" && value !== null && name) {
                 categories.push({value, name});
             }
         }
@@ -165,8 +165,8 @@ export class HomePage extends BasePage {
     // Метод для получения категории объявления по индексу
     async getItemCategory(itemIndex: number): Promise<string> {
         const categoryLocator = this.itemPrices.nth(itemIndex)
-            .locator('..') // Поднимаемся к родителю
-            .locator('div[class*="_card__category_15fhn_259"]');
+            .locator("..") // Поднимаемся к родителю
+            .locator("div[class*=\"_card__category_15fhn_259\"]");
         
         const categoryText = await categoryLocator.textContent();
         if (!categoryText) {
@@ -191,7 +191,7 @@ export class HomePage extends BasePage {
     // Метод для нажатия на тогл "Только срочные"
     async toggleUrgentOnly(enable: boolean) {
         const isChecked = await this.urgentToggle.evaluate(el => {
-            const input = el.closest('label')?.querySelector('input[type="checkbox"]');
+            const input = el.closest("label")?.querySelector("input[type=\"checkbox\"]");
             return input ? (input as HTMLInputElement).checked : false;
         });
         
@@ -212,14 +212,14 @@ export class HomePage extends BasePage {
     async getCurrentTheme() {
         const buttonHtml = await this.themeToggle.innerHTML();
     
-        if (buttonHtml.includes('☀️') || buttonHtml.includes('Светлая')) {
-            return 'light';
+        if (buttonHtml.includes("☀️") || buttonHtml.includes("Светлая")) {
+            return "light";
         }
-        if (buttonHtml.includes('🌙') || buttonHtml.includes('Темная')) {
-            return 'dark';
+        if (buttonHtml.includes("🌙") || buttonHtml.includes("Темная")) {
+            return "dark";
         }
         
-        throw new Error('Не удалось определить текущую тему');
+        throw new Error("Не удалось определить текущую тему");
     }
 
     // Метод для получения цвета фона body
@@ -240,9 +240,9 @@ export class HomePage extends BasePage {
     async saveThemeToStorage() {
         const theme = await this.getCurrentTheme();
         await this.page.evaluate((currentTheme) => {
-            localStorage.setItem('savedTheme', currentTheme);
+            localStorage.setItem("savedTheme", currentTheme);
         }, theme);
-}
+    }
 
 
     // ===================== ASSERTS =====================
@@ -269,11 +269,11 @@ export class HomePage extends BasePage {
 
     // Проверка состояния "Объявления не найдены"
     async assertEmptyStateIsVisible() {
-        await expect(this.emptyStateTitle, 'Заголовок "Объявления не найдены" не отображается')
+        await expect(this.emptyStateTitle, "Заголовок \"Объявления не найдены\" не отображается")
             .toBeVisible();
-        await expect(this.emptyStateHint, 'Подсказка "Попробуйте изменить параметры фильтрации" не отображается')
+        await expect(this.emptyStateHint, "Подсказка \"Попробуйте изменить параметры фильтрации\" не отображается")
             .toBeVisible();
-        await expect(this.resetFiltersButton, 'Кнопка "Сбросить фильтры" не отображается')
+        await expect(this.resetFiltersButton, "Кнопка \"Сбросить фильтры\" не отображается")
             .toBeVisible();
     }
 
@@ -282,25 +282,25 @@ export class HomePage extends BasePage {
         // Проверяем поле "От"
         const fromInputHasError = await this.priceFromInput.evaluate((element) => {
             const el = element as HTMLInputElement;
-            return el.classList.contains('error') ||
-                   el.classList.contains('_error') ||
-                   el.classList.contains('invalid') ||
-                   el.getAttribute('aria-invalid') === 'true' ||
-                   getComputedStyle(el).borderColor === 'rgb(255, 0, 0)' ||
-                   getComputedStyle(el).borderColor === 'red' ||
-                   el.style.borderColor === 'red';
+            return el.classList.contains("error") ||
+                   el.classList.contains("_error") ||
+                   el.classList.contains("invalid") ||
+                   el.getAttribute("aria-invalid") === "true" ||
+                   getComputedStyle(el).borderColor === "rgb(255, 0, 0)" ||
+                   getComputedStyle(el).borderColor === "red" ||
+                   el.style.borderColor === "red";
         });
         
         // Проверяем поле "До"
         const toInputHasError = await this.priceToInput.evaluate((element) => {
             const el = element as HTMLInputElement;
-            return el.classList.contains('error') ||
-                   el.classList.contains('_error') ||
-                   el.classList.contains('invalid') ||
-                   el.getAttribute('aria-invalid') === 'true' ||
-                   getComputedStyle(el).borderColor === 'rgb(255, 0, 0)' ||
-                   getComputedStyle(el).borderColor === 'red' ||
-                   el.style.borderColor === 'red';
+            return el.classList.contains("error") ||
+                   el.classList.contains("_error") ||
+                   el.classList.contains("invalid") ||
+                   el.getAttribute("aria-invalid") === "true" ||
+                   getComputedStyle(el).borderColor === "rgb(255, 0, 0)" ||
+                   getComputedStyle(el).borderColor === "red" ||
+                   el.style.borderColor === "red";
         });
         
         expect(fromInputHasError, 
@@ -317,13 +317,13 @@ export class HomePage extends BasePage {
     // Проверка, что поле "От" пустое
     async assertPriceFromInputIsEmpty() {
         const fromValue = await this.priceFromInput.inputValue();
-        expect(fromValue, 'Поле "От" должно быть пустым').toBe('');
+        expect(fromValue, "Поле \"От\" должно быть пустым").toBe("");
     }
 
     // Проверка, что поле "До" пустое
     async assertPriceToInputIsEmpty() {
         const toValue = await this.priceToInput.inputValue();
-        expect(toValue, 'Поле "До" должно быть пустым').toBe('');
+        expect(toValue, "Поле \"До\" должно быть пустым").toBe("");
     }
 
     // Проверка, что цены идут в неубывающем порядке (>=)
@@ -388,7 +388,7 @@ export class HomePage extends BasePage {
         const uniqueCategories = [...new Set(categories)];
         
         expect(uniqueCategories.length, 
-            `После сброса фильтра должно быть несколько категорий, найдено: ${uniqueCategories.join(', ')}`)
+            `После сброса фильтра должно быть несколько категорий, найдено: ${uniqueCategories.join(", ")}`)
             .toBeGreaterThan(1);
     }
 
@@ -423,7 +423,7 @@ export class HomePage extends BasePage {
         const nonUrgentCount = await this.getItemsWithoutUrgentIndicatorCount();
         
         expect(nonUrgentCount, 
-            `После выключения тогла должны появиться объявления без индикатора "Срочно"`)
+            "После выключения тогла должны появиться объявления без индикатора \"Срочно\"")
             .toBeGreaterThan(0);
     }
     
@@ -447,34 +447,34 @@ export class HomePage extends BasePage {
     // Проверка, что тема светлая
     async assertThemeIsLight() {
         const theme = await this.getCurrentTheme();
-        expect(theme, 'Тема должна быть светлой').toBe('light');
+        expect(theme, "Тема должна быть светлой").toBe("light");
         
-        const dataTheme = await this.body.getAttribute('data-theme');
+        const dataTheme = await this.body.getAttribute("data-theme");
         if (dataTheme) {
-            expect(dataTheme, 'data-theme должен быть light').toBe('light');
+            expect(dataTheme, "data-theme должен быть light").toBe("light");
         }
     }
 
     // Проверка, что тема темная
     async assertThemeIsDark() {
         const theme = await this.getCurrentTheme();
-        expect(theme, 'Тема должна быть темной').toBe('dark');
+        expect(theme, "Тема должна быть темной").toBe("dark");
         
-        const dataTheme = await this.body.getAttribute('data-theme');
+        const dataTheme = await this.body.getAttribute("data-theme");
         if (dataTheme) {
-            expect(dataTheme, 'data-theme должен быть dark').toBe('dark');
+            expect(dataTheme, "data-theme должен быть dark").toBe("dark");
         }
     }
 
     // Проверка, что сохраненная тема совпадает с текущей
     async assertThemeMatchesSaved() {
         const savedTheme = await this.page.evaluate(() => {
-            return localStorage.getItem('savedTheme');
+            return localStorage.getItem("savedTheme");
         });
         const currentTheme = await this.getCurrentTheme();
         
         expect(currentTheme, `Тема должна быть ${savedTheme}, но текущая ${currentTheme}`)
-            .toBe(savedTheme as 'light' | 'dark');
+            .toBe(savedTheme as "light" | "dark");
     }
 }
 

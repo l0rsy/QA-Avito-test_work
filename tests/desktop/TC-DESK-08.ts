@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Тогл 'Только срочные'", () => {
     test("TC-DESK-08: Проверка тогла 'Только срочные' ", async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe("Тогл 'Только срочные'", () => {
         await homePage.open();
         
         const hasBoth = await homePage.assertBothUrgentAndRegularItems();
-        test.skip(!hasBoth, 'В ленте нет одновременно срочных и обычных объявлений для проверки');
+        test.skip(!hasBoth, "В ленте нет одновременно срочных и обычных объявлений для проверки");
 
         await homePage.toggleUrgentOnly(true);
 

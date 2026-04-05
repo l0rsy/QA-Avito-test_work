@@ -1,5 +1,5 @@
-import { test  } from '@playwright/test';
-import { StatisticPage } from '../../pages/statisticsPage/statisticsPage';
+import { test  } from "@playwright/test";
+import { StatisticPage } from "../../pages/statisticsPage/statisticsPage";
 
 test.describe("Управление таймером статистики", () => {
     test("TC-STATS-03: Возобновление таймера", async ({ page }) => {

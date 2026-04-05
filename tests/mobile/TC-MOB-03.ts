@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test, expect } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Мобильная версия - сохранение темы", () => {
     test("TC-MOB-03: Переключение и сохранение темы после выхода", async ({ page }) => {
@@ -13,11 +13,11 @@ test.describe("Мобильная версия - сохранение темы",
         const initialTheme = await homePage.getCurrentTheme();
         await homePage.toggleTheme();
         const newTheme = await homePage.getCurrentTheme();
-        expect(newTheme, 'Тема должна измениться после переключения').not.toBe(initialTheme);
+        expect(newTheme, "Тема должна измениться после переключения").not.toBe(initialTheme);
         
         // Перезагружаем страницу
-        await page.reload({ waitUntil: 'networkidle' });
-        await page.locator('body').waitFor({ state: 'visible' });
+        await page.reload({ waitUntil: "networkidle" });
+        await page.locator("body").waitFor({ state: "visible" });
         
         // Assert
         const themeAfterReload = await homePage.getCurrentTheme();

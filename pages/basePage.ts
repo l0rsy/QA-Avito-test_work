@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export class BasePage {
     protected page: Page;
@@ -18,7 +18,7 @@ export class BasePage {
         // Виден ли индикатор загрузки?
         if (await loadingIndicator.isVisible().catch(() => false)) {
 
-            await loadingIndicator.waitFor({ state : 'hidden', timeout : 10000 });
+            await loadingIndicator.waitFor({ state : "hidden", timeout : 10000 });
         }
         await this.page.waitForTimeout(500);
     }
@@ -32,7 +32,7 @@ export class BasePage {
             // pressSequentially для случая, если вводим строку
             try {
                 await inputLocator.fill(value);
-            } catch (error) {
+            } catch (_error) {
                 await inputLocator.pressSequentially(value);
             }
         }

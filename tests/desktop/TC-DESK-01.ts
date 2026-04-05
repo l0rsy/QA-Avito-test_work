@@ -1,5 +1,5 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../../pages/homePage/homePage';
+import { test } from "@playwright/test";
+import { HomePage } from "../../pages/homePage/homePage";
 
 test.describe("Фильтр диапазона цен", () => {
     test("TC-DESK-01: Проверка фильтрации по диапазону цен", async ({ page }) => {
