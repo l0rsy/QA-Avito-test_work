@@ -1,4 +1,4 @@
-# Тестовое задание QA Любарец С.Е.
+# QA: manual testing + E2E autotests for testboard.avito.com
 
 ## Инструкция по запуску тестов для задания 2.2
 
